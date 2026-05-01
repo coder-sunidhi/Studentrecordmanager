@@ -1,153 +1,83 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
 
-// Student class
-class Student {
-    private int id;
-    private String name;
-    private int age;
-    private String course;
-
-    public Student(int id, String name, int age, String course) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
-        this.course = course;
-    }
-
-    // Getters
-    public int getId() { return id; }
-    public int getAge() { return age; }
-    public String getCourse() { return course; }
-
-    public void setName(String name) { this.name = name; }
-    public void setAge(int age) { this.age = age; }
-    public void setCourse(String course) { this.course = course; }
-
-    @Override
-    public String toString() {
-        return "ID: " + id + ", Name: " + name +
-                ", Age: " + age + ", Course: " + course;
-    }
-}
-
-// Service class
-class StudentService {
-
-    private ArrayList<Student> studentList = new ArrayList<>();   // ✅ REQUIRED
-    private HashSet<Integer> idSet = new HashSet<>();             // ✅ REQUIRED
-
-    public void addStudent(Student s) {
-        if (idSet.contains(s.getId())) {
-            System.out.println("ID already exists!");
-            return;
-        }
-
-        studentList.add(s);
-        idSet.add(s.getId());
-        System.out.println("Student added!");
-    }
-
-    public void searchStudent(int id) {
-        for (Student s : studentList) {
-            if (s.getId() == id) {
-                System.out.println(s);
-                return;
-            }
-        }
-        System.out.println("Student not found!");
-    }
-
-    public void displayAll() {
-        if (studentList.isEmpty()) {
-            System.out.println("No records.");
-            return;
-        }
-
-        // ✅ Using StringBuilder
-        StringBuilder sb = new StringBuilder();
-        for (Student s : studentList) {
-            sb.append(s.toString()).append("\n");
-        }
-
-        System.out.println(sb.toString());
-    }
-
-    public void deleteStudent(int id) {
-        Iterator<Student> it = studentList.iterator();
-
-        while (it.hasNext()) {
-            Student s = it.next();
-            if (s.getId() == id) {
-                it.remove();
-                idSet.remove(id);
-                System.out.println("Deleted successfully!");
-                return;
-            }
-        }
-
-        System.out.println("Student not found!");
-    }
-}
-
-// Main class
-public class Main {
+public class StudentRecordsManager {
     public static void main(String[] args) {
-
+        ArrayList<String> students = new ArrayList<>();
+        HashMap<String, Integer> marksMap = new HashMap<>();
         Scanner sc = new Scanner(System.in);
-        StudentService service = new StudentService();
-
-        while (true) {
-            try {
-                System.out.println("\n1.Add 2.Search 3.Display 4.Delete 5.Exit");
-                System.out.print("Enter choice: ");
-                int choice = sc.nextInt();
-
-                switch (choice) {
-                    case 1:
-                        System.out.print("ID: ");
-                        int id = sc.nextInt();
-                        sc.nextLine();
-
-                        System.out.print("Name: ");
-                        String name = sc.nextLine();
-
-                        System.out.print("Age: ");
-                        int age = sc.nextInt();
-                        sc.nextLine();
-
-                        System.out.print("Course: ");
-                        String course = sc.nextLine();
-
-                        service.addStudent(new Student(id, name, age, course));
-                        break;
-
-                    case 2:
-                        System.out.print("Enter ID: ");
-                        service.searchStudent(sc.nextInt());
-                        break;
-
-                    case 3:
-                        service.displayAll();
-                        break;
-
-                    case 4:
-                        System.out.print("Enter ID: ");
-                        service.deleteStudent(sc.nextInt());
-                        break;
-
-                    case 5:
-                        System.out.println("Bye!");
-                        sc.close();
-                        return;
-
-                    default:
-                        System.out.println("Invalid choice");
-                }
-
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter correct data.");
-                sc.nextLine(); // clear buffer
+        
+        int choice;
+        
+        do {
+            System.out.println("\n=== Student Records Manager ===");
+            System.out.println("1. Add Student");
+            System.out.println("2. Search Student");
+            System.out.println("3. Display All Students");
+            System.out.println("4. Delete Student");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+            
+            switch (choice) {
+                case 1: // Add
+                    System.out.print("Enter student name: ");
+                    String name = sc.nextLine();
+                    System.out.print("Enter marks: ");
+                    int marks = sc.nextInt();
+                    
+                    if (!students.contains(name)) {
+                        students.add(name);
+                        marksMap.put(name, marks);
+                        System.out.println("✅ Student added successfully!");
+                    } else {
+                        System.out.println("Student already exists!");
+                    }
+                    break;
+                    
+                case 2: // Search
+                    System.out.print("Enter student name to search: ");
+                    String searchName = sc.nextLine();
+                    if (marksMap.containsKey(searchName)) {
+                        System.out.println(searchName + " -> Marks: " + marksMap.get(searchName));
+                    } else {
+                        System.out.println("Student not found!");
+                    }
+                    break;
+                    
+                case 3: // Display
+                    if (students.isEmpty()) {
+                        System.out.println("No students found!");
+                    } else {
+                        System.out.println("\nAll Students:");
+                        for (String s : students) {
+                            System.out.println(s + " : " + marksMap.get(s));
+                        }
+                    }
+                    break;
+                    
+                case 4: // Delete
+                    System.out.print("Enter student name to delete: ");
+                    String delName = sc.nextLine();
+                    if (students.remove(delName)) {
+                        marksMap.remove(delName);
+                        System.out.println("✅ Student deleted!");
+                    } else {
+                        System.out.println("Student not found!");
+                    }
+                    break;
+                    
+                case 5:
+                    System.out.println("Thank you! Goodbye 👋");
+                    break;
+                    
+                default:
+                    System.out.println("Invalid choice!");
             }
-        }
+        } while (choice != 5);
+        
+        sc.close();
     }
 }
